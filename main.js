@@ -119,7 +119,10 @@ async function handleFormSubmit(event) {
             dataObject[key].push(value);
         } else {
             // Для всех остальных полей
-            dataObject[key] = value;
+            // *** ИСПРАВЛЕНИЕ: ***
+            // Если значение - пустая строка, отправляем null.
+            // Это исправляет ошибку "invalid input syntax for type date".
+            dataObject[key] = value === "" ? null : value;
         }
     });
 
@@ -188,4 +191,5 @@ function showStatus(message, type) {
     statusMessage.className = type; // 'success' или 'error'
     statusMessage.style.display = 'block';
 }
+
 
