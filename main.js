@@ -103,12 +103,65 @@ async function handleFormSubmit(event) {
         return;
     }
 
+    // --- НОВЫЙ БЛОК: ЗАГРУЗКА ФАЙЛОВ ---
+    const files = document.getElementById('medical_records').files;
+    const uploadPromises = [];
+    // Уникальный ID для этой отправки, чтобы сгруппировать файлы в хранилище
+    const submissionId = crypto.randomUUID(); 
+    const uploadedFileUrls = [];
+
+    if (files.length > 0) {
+        for (const file of files) {
+            // Генерируем уникальное имя файла, сохраняя расширение
+            const fileExt = file.name.split('.').pop();
+            const uniqueFileName = `${crypto.randomUUID()}.${fileExt}`;
+            // Путь: submissions/{id_заявки}/{уникальное_имя_файла}
+            // Это организует файлы по заявкам
+            const filePath = `submissions/${submissionId}/${uniqueFileName}`;
+
+            // Добавляем обещание загрузки в массив
+            uploadPromises.push(
+                supabase.storage
+                    .from('medical_records') // Название нашего Бакета
+                    .upload(filePath, file)
+            );
+        }
+    }
+
+    try {
+        // Ждем завершения всех загрузок параллельно
+        const uploadResults = await Promise.all(uploadPromises);
+        
+        // Проверяем на ошибки и собираем URL
+        for (const result of uploadResults) {
+            if (result.error) {
+                // Если хоть один файл не загрузился, прерываем
+                throw new Error(`Ошибка загрузки файла: ${result.error.message}`);
+            }
+            // Получаем публичный URL для успешно загруженного файла
+            const { data: urlData } = supabase.storage
+                .from('medical_records')
+                .getPublicUrl(result.data.path);
+            
+            if (urlData) {
+                uploadedFileUrls.push(urlData.publicUrl);
+            }
+        }
+    
+    } catch (uploadError) {
+         console.error('Ошибка в процессе загрузки файла:', uploadError);
+         // Показываем ошибку пользователю и останавливаем отправку
+         showStatus(`Ошибка загрузки файла: ${uploadError.message}. Отправка отменена.`, 'error');
+         setLoading(false);
+         return; // Прерываем выполнение функции
+    }
+    // --- КОНЕЦ НОВОГО БЛОКА ---
+
+
     // 3. Сбор данных из формы
     const formData = new FormData(form);
     
-    // Object.fromEntries не справляется с чекбоксами (берет только последний)
-    // и радио-кнопками (если не выбраны).
-    // Мы соберем данные вручную для надежности.
+    // ... (существующий код сбора dataObject) ...
     const dataObject = {};
     formData.forEach((value, key) => {
         // Если ключ - это preferred_messenger, мы обрабатываем его как массив
@@ -126,16 +179,21 @@ async function handleFormSubmit(event) {
         }
     });
 
-    // Удаляем поле 'medical_records', так как мы не загружаем файлы в этой функции.
-    // Загрузка файлов (Supabase Storage) - это отдельный, более сложный процесс.
+    // Удаляем поле 'medical_records', так как мы не хотим слать FileList в БД
     delete dataObject.medical_records;
+
+    // !! ДОБАВЛЯЕМ ССЫЛКИ НА ФАЙЛЫ В НАШ ОБЪЕКТ !!
+    // Сохраняем массив URL (или null, если файлов не было)
+    dataObject.medical_record_urls = uploadedFileUrls.length > 0 ? uploadedFileUrls : null;
+
 
     // 4. Отправка данных в Supabase
     try {
-        const { data, error } = await supabase
+        // ИЗМЕНЕНИЕ: Мы убираем .select(), чтобы избежать проблем с RLS (Row Level Security)
+        // Нам не нужно читать данные после вставки, нам достаточно знать, что нет ошибки.
+        const { error } = await supabase
             .from('patient_questionnaires') // Название вашей таблицы
-            .insert([dataObject]) // Вставляем объект
-            .select(); // Возвращаем вставленные данные
+            .insert([dataObject]); // Вставляем объект
 
         if (error) {
             // Если Supabase возвращает ошибку
@@ -143,7 +201,8 @@ async function handleFormSubmit(event) {
         }
 
         // 5. Успешная отправка
-        console.log('Успешно отправлено:', data);
+        // 'data' теперь будет null, так как мы убрали .select(), это нормально.
+        console.log('Анкета и файлы успешно отправлены.');
         showStatus('Анкета успешно отправлена. Мы свяжемся с вами.', 'success');
         form.reset(); // Очищаем форму
         
@@ -191,5 +250,6 @@ function showStatus(message, type) {
     statusMessage.className = type; // 'success' или 'error'
     statusMessage.style.display = 'block';
 }
+
 
 
