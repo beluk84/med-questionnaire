@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Медицинская Анкета Пациента</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 
+      ЧАСТЬ 2: FRONTEND (HTML)
+      - Подключение Supabase JS v2
+    -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Подключение нашего скрипта -->
+    <script src="main.js" defer></script>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Медицинская Анкета Пациента</h1>
+            <p>Пожалуйста, заполните форму как можно подробнее. Эта информация является конфиденциальной и необходима для составления предварительного плана лечения.</p>
+        </header>
+
+        <form id="medical-form" novalidate>
+            
+            <!-- Блок 1: Личные данные -->
+            <fieldset>
+                <legend>1. Личные данные</legend>
+                
+                <div class="form-group">
+                    <label for="patient_name">Имя пациента (ФИО полностью) *</label>
+                    <input type="text" id="patient_name" name="patient_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date_of_birth">Дата рождения пациента</label>
+                    <input type="date" id="date_of_birth" name="date_of_birth">
+                </div>
+                
+                <div class="form-group">
+                    <label for="country_of_residence">Страна проживания</label>
+                    <!-- Вы можете заполнить этот список странами -->
+                    <select id="country_of_residence" name="country_of_residence">
+                        <option value="">Выберите страну...</option>
+                        <option value="RU">Россия</option>
+                        <option value="KZ">Казахстан</option>
+                        <option value="BY">Беларусь</option>
+                        <option value="UA">Украина</option>
+                        <option value="Other">Другая</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="city_of_residence">Город проживания</label>
+                    <input type="text" id="city_of_residence" name="city_of_residence">
+                </div>
+
+                <div class="form-group">
+                    <label for="contact_person_name">Имя контактного лица (если заполняет не пациент)</label>
+                    <input type="text" id="contact_person_name" name="contact_person_name">
+                </div>
+            </fieldset>
+            
+            <!-- Блок 2: Контактная информация -->
+            <fieldset>
+                <legend>2. Контактная информация</legend>
+
+                <div class="form-group">
+                    <label for="phone_number">Ваш телефон (с кодом страны) *</label>
+                    <input type="tel" id="phone_number" name="phone_number" placeholder="+7 (999) 123-45-67" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Выберите удобный мессенджер</label>
+                    <div class="checkbox-group">
+                        <div>
+                            <input type="checkbox" id="cb_whatsapp" name="preferred_messenger" value="WhatsApp">
+                            <label for="cb_whatsapp">WhatsApp</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="cb_telegram" name="preferred_messenger" value="Telegram">
+                            <label for="cb_telegram">Telegram</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="cb_viber" name="preferred_messenger" value="Viber">
+                            <label for="cb_viber">Viber</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email_address">Ваш email *</label>
+                    <input type="email" id="email_address" name="email_address" placeholder="example@mail.com" required>
+                </div>
+            </fieldset>
+
+            <!-- Блок 3: Медицинская история -->
+            <fieldset>
+                <legend>3. Медицинская история</legend>
+
+                <div class="form-group">
+                    <label for="diagnosis">Диагноз пациента *</label>
+                    <input type="text" id="diagnosis" name="diagnosis" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="medical_history">История болезни</label>
+                    <textarea id="medical_history" name="medical_history" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="duration_of_illness">Продолжительность заболевания</label>
+                    <input type="text" id="duration_of_illness" name="duration_of_illness">
+                </div>
+
+                <div class="form-group">
+                    <label for="difficulties_goals_rehabilitation">Опишите цели предстоящей реабилитации</label>
+                    <textarea id="difficulties_goals_rehabilitation" name="difficulties_goals_rehabilitation" rows="4"></textarea>
+                </div>
+            </fieldset>
+            
+            <!-- Блок 4: Анамнез -->
+            <fieldset>
+                <legend>4. Анамнез</legend>
+
+                <!-- Условные поля будут использовать data-controls="ID_обертки" -->
+                
+                <div class="form-group radio-group">
+                    <label>Есть вывих или подвывих суставов (тазобедренный сустав)?</label>
+                    <div>
+                        <input type="radio" id="joint_dislocation_yes" name="joint_dislocation" value="Да">
+                        <label for="joint_dislocation_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="joint_dislocation_no" name="joint_dislocation" value="Нет" checked>
+                        <label for="joint_dislocation_no">Нет</label>
+                    </div>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Находитесь на психиатрическом или наркологическом диспансерном учете?</label>
+                    <div>
+                        <input type="radio" id="psychiatric_yes" name="psychiatric_or_narcologic" value="Да">
+                        <label for="psychiatric_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="psychiatric_no" name="psychiatric_or_narcologic" value="Нет" checked>
+                        <label for="psychiatric_no">Нет</label>
+                    </div>
+                </div>
+                
+                <div class="form-group radio-group">
+                    <label>Находитесь на кожно-венерологическом диспансерном учете?</label>
+                    <div>
+                        <input type="radio" id="dermatological_yes" name="dermatological" value="Да">
+                        <label for="dermatological_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="dermatological_no" name="dermatological" value="Нет" checked>
+                        <label for="dermatological_no">Нет</label>
+                    </div>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Аллергия на лекарственные препараты или продукты питания?</label>
+                    <div>
+                        <!-- Этот input управляет показом поля 'allergy_description-wrapper' -->
+                        <input type="radio" id="allergies_yes" name="allergies" value="Да" data-controls="allergy_description-wrapper">
+                        <label for="allergies_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="allergies_no" name="allergies" value="Нет" data-controls="allergy_description-wrapper" checked>
+                        <label for="allergies_no">Нет</label>
+                    </div>
+                </div>
+                <!-- Условное поле -->
+                <div class="form-group conditional-field" id="allergy_description-wrapper">
+                    <label for="allergy_description">Коротко опишите на какие</label>
+                    <textarea id="allergy_description" name="allergy_description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Имеет ли опасные для здоровья заболевания?</label>
+                    <div>
+                        <input type="radio" id="serious_health_yes" name="serious_health_conditions" value="Да" data-controls="dangerous_diseases_description-wrapper">
+                        <label for="serious_health_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="serious_health_no" name="serious_health_conditions" value="Нет" data-controls="dangerous_diseases_description-wrapper" checked>
+                        <label for="serious_health_no">Нет</label>
+                    </div>
+                </div>
+                <!-- Условное поле -->
+                <div class="form-group conditional-field" id="dangerous_diseases_description-wrapper">
+                    <label for="dangerous_diseases_description">Какие заболевания?</label>
+                    <textarea id="dangerous_diseases_description" name="dangerous_diseases_description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Сердечно – сосудистые заболевания?</label>
+                    <div>
+                        <input type="radio" id="cardio_yes" name="cardiovascular_disease" value="Да" data-controls="cardiovascular_description-wrapper">
+                        <label for="cardio_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="cardio_no" name="cardiovascular_disease" value="Нет" data-controls="cardiovascular_description-wrapper" checked>
+                        <label for="cardio_no">Нет</label>
+                    </div>
+                </div>
+                <!-- Условное поле -->
+                <div class="form-group conditional-field" id="cardiovascular_description-wrapper">
+                    <label for="cardiovascular_description">Коротко опишите, про заболевание</label>
+                    <textarea id="cardiovascular_description" name="cardiovascular_description" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group radio-group">
+                    <label>Заболевания дыхательной системы?</label>
+                    <div>
+                        <input type="radio" id="respiratory_yes" name="respiratory_disease" value="Да" data-controls="respiratory_description-wrapper">
+                        <label for="respiratory_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="respiratory_no" name="respiratory_disease" value="Нет" data-controls="respiratory_description-wrapper" checked>
+                        <label for="respiratory_no">Нет</label>
+                    </div>
+                </div>
+                <!-- Условное поле -->
+                <div class="form-group conditional-field" id="respiratory_description-wrapper">
+                    <label for="respiratory_description">Коротко опишите, про заболевание</label>
+                    <textarea id="respiratory_description" name="respiratory_description" rows="3"></textarea>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Постоянно повышенная температура 37 и выше (гипертермии)?</label>
+                    <div>
+                        <input type="radio" id="fever_yes" name="fever" value="Да" data-controls="temperature-wrapper">
+                        <label for="fever_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="fever_no" name="fever" value="Нет" data-controls="temperature-wrapper" checked>
+                        <label for="fever_no">Нет</label>
+                    </div>
+                </div>
+                <!-- Условное поле -->
+                <div class="form-group conditional-field" id="temperature-wrapper">
+                    <label for="temperature">Какая температура?</label>
+                    <input type="text" id="temperature" name="temperature">
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Инфекционные заболевания?</label>
+                    <div>
+                        <input type="radio" id="infectious_yes" name="infectious_diseases" value="Да" data-controls="infectious_description-wrapper">
+                        <label for="infectious_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="infectious_no" name="infectious_diseases" value="Нет" data-controls="infectious_description-wrapper" checked>
+                        <label for="infectious_no">Нет</label>
+                    </div>
+                </div>
+                <!-- Условное поле -->
+                <div class="form-group conditional-field" id="infectious_description-wrapper">
+                    <label for="infectious_description">Какое заболевание?</label>
+                    <input type="text" id="infectious_description" name="infectious_description">
+                </div>
+
+            </fieldset>
+
+            <!-- Блок 5: Судороги -->
+            <fieldset>
+                <legend>5. Эпилепсия (Судороги)</legend>
+
+                <div class="form-group radio-group">
+                    <label>Эпилепсия (Судороги)?</label>
+                    <div>
+                        <input type="radio" id="seizures_yes" name="seizures" value="Да">
+                        <label for="seizures_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="seizures_no" name="seizures" value="Нет" checked>
+                        <label for="seizures_no">Нет</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="seizure_type">Тип судорог</label>
+                    <select id="seizure_type" name="seizure_type">
+                        <option value="">Выберите тип...</option>
+                        <option value="tonic_clonic">Тонико-клонические</option>
+                        <option value="absence">Абсансы</option>
+                        <option value="myoclonic">Миоклонические</option>
+                        <option value="focal">Фокальные</option>
+                        <option value="unknown">Неизвестно</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="seizure_frequency">Количество эпилептических приступов, как часто приступы?</label>
+                    <textarea id="seizure_frequency" name="seizure_frequency" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="anticonvulsants">Противосудорожные препараты (Наименование и дозировка)?</label>
+                    <input type="text" id="anticonvulsants" name="anticonvulsants">
+                </div>
+                
+                <div class="form-group">
+                    <label for="last_seizure_date">Когда был последний приступ?</label>
+                    <input type="date" id="last_seizure_date" name="last_seizure_date">
+                </div>
+            </fieldset>
+            
+            <!-- Блок 6: Навыки и состояние -->
+            <fieldset>
+                <legend>6. Навыки и текущее состояние</legend>
+                
+                <div class="form-group">
+                    <label for="speech_skills">Речевые навыки</label>
+                    <select id="speech_skills" name="speech_skills">
+                        <option value="">Выберите...</option>
+                        <option value="full_speech">Развернутая речь</option>
+                        <option value="phrases">Говорит фразами</option>
+                        <option value="words">Говорит отдельные слова</option>
+                        <option value="sounds">Только звуки</option>
+                        <option value="no_speech">Речь отсутствует</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="instructions_followed">Выполнение инструкций</label>
+                    <select id="instructions_followed" name="instructions_followed">
+                        <option value="">Выберите...</option>
+                        <option value="always">Выполняет всегда</option>
+                        <option value="sometimes">Выполняет с подсказкой</option>
+                        <option value="rarely">Выполняет редко</option>
+                        <option value="never">Не выполняет</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="comprehension_level">Понимание речи</label>
+                    <select id="comprehension_level" name="comprehension_level">
+                        <option value="">Выберите...</option>
+                        <option value="full">Понимает полностью</option>
+                        <option value="partial">Понимает частично (бытовую)</option>
+                        <option value="none">Не понимает</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="physical_abilities">Физические навыки (ходит, ползает, сидит)</label>
+                    <textarea id="physical_abilities" name="physical_abilities" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="dietary_issues">Опишите особенности питания, жевания, глотания...</label>
+                    <textarea id="dietary_issues" name="dietary_issues" rows="4"></textarea>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Как аппетит?</label>
+                    <div>
+                        <input type="radio" id="appetite_good" name="appetite" value="Хороший">
+                        <label for="appetite_good">Хороший</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="appetite_medium" name="appetite" value="Средний">
+                        <label for="appetite_medium">Средний</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="appetite_bad" name="appetite" value="Плохой">
+                        <label for="appetite_bad">Плохой</label>
+                    </div>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Стул?</label>
+                    <div>
+                        <input type="radio" id="bowel_regular" name="bowel_movements" value="Регулярный">
+                        <label for="bowel_regular">Регулярный</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="bowel_irregular" name="bowel_movements" value="Нерегулярный">
+                        <label for="bowel_irregular">Нерегулярный</label>
+                    </div>
+                </div>
+
+                <div class="form-group radio-group">
+                    <label>Иммунитет?</label>
+                    <div>
+                        <input type="radio" id="immune_strong" name="immune_system" value="Крепкий">
+                        <label for="immune_strong">Крепкий</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="immune_weak" name="immune_system" value="Слабый">
+                        <label for="immune_weak">Слабый</label>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Блок 7: Завершение -->
+            <fieldset>
+                <legend>7. Дополнительная информация</legend>
+
+                <div class="form-group radio-group">
+                    <label>Были на лечении в Китае?</label>
+                    <div>
+                        <input type="radio" id="china_yes" name="treatment_in_china" value="Да">
+                        <label for="china_yes">Да</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="china_no" name="treatment_in_china" value="Нет" checked>
+                        <label for="china_no">Нет</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="special_requests">Какие у вас есть вопросы к доктору или администрации?</label>
+                    <textarea id="special_requests" name="special_requests" rows="5"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="start_of_treatment_date">Выберите примерную дату начала лечения</label>
+                    <input type="date" id="start_of_treatment_date" name="start_of_treatment_date">
+                </div>
+
+                <div class="form-group">
+                    <label for="medical_records">Прикрепите медицинские выписки (файлы до 30 МБ)</label>
+                    <input type="file" id="medical_records" name="medical_records" multiple>
+                </div>
+                
+                <div class="form-group">
+                    <label for="statements_links">Ссылка на облачное хранилище для файлов > 30 МБ (Google Drive, Yandex Disk и т.п.)</label>
+                    <input type="text" id="statements_links" name="statements_links" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label for="traffic_source">Откуда вы узнали о нас?</label>
+                    <select id="traffic_source" name="traffic_source">
+                        <option value="">Выберите источник...</option>
+                        <option value="search_engine">Поисковая система (Google, Yandex)</option>
+                        <option value="social_media">Социальные сети</option>
+                        <option value="recommendation">Рекомендация друзей/знакомых</option>
+                        <option value="doctor">Направил врач</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+            </fieldset>
+            
+            <!-- Сообщение о статусе -->
+            <div id="status-message" aria-live="polite"></div>
+
+            <!-- Кнопка отправки -->
+            <button type="submit" id="submit-btn">Отправить анкету</button>
+
+        </form>
+    </div>
+
+</body>
+</html>

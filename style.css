@@ -1,0 +1,294 @@
+/* ЧАСТЬ 2: FRONTEND (CSS)
+   Базовые стили для медицинской анкеты.
+*/
+
+:root {
+    --primary-color: #007bff;
+    --primary-dark: #0056b3;
+    --bg-color: #f8f9fa;
+    --form-bg: #ffffff;
+    --border-color: #dee2e6;
+    --text-color: #212529;
+    --label-color: #495057;
+    --error-color: #dc3545;
+    --success-color: #28a745;
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Базовая настройка */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: var(--form-bg);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+}
+
+header p {
+    font-size: 0.95rem;
+    color: var(--label-color);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Форма и Филдсеты */
+#medical-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+fieldset {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+legend {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    padding: 0 0.5rem;
+    margin-left: 0.5rem;
+}
+
+/* Группы полей */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label,
+.radio-group > label,
+.checkbox-group > label {
+    font-weight: 600;
+    color: var(--label-color);
+}
+
+/* Стили полей */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-family: var(--font-family);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+input[type="file"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
+}
+
+input[type="file"] {
+    padding: 0.5rem;
+}
+
+input[type="file"]::file-selector-button {
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--primary-color);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 1rem;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background-color: var(--primary-dark);
+}
+
+
+textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Чекбоксы и Радио-кнопки */
+.radio-group,
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Контейнер для горизонтального расположения */
+.radio-group > div,
+.checkbox-group > div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.radio-group > div > label,
+.checkbox-group > div > label {
+    font-weight: 400; /* Обычный вес для опций */
+    color: var(--text-color);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    width: 1.15em;
+    height: 1.15em;
+    cursor: pointer;
+}
+
+/* Условные поля */
+.conditional-field {
+    display: none; /* Скрыто по умолчанию */
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary-color);
+    margin-top: 0.5rem;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Кнопка */
+button[type="submit"] {
+    padding: 0.85rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    background-color: var(--primary-color);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    margin-top: 1rem;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+button[type="submit"]:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Сообщения о статусе */
+#status-message {
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    display: none; /* Скрыто, пока не появится сообщение */
+}
+
+#status-message.success {
+    background-color: #e6f7ec;
+    color: var(--success-color);
+    display: block;
+}
+
+#status-message.error {
+    background-color: #fdecea;
+    color: var(--error-color);
+    display: block;
+}
+
+/* Валидация */
+input:required:invalid:not(:placeholder-shown) {
+    border-color: var(--error-color);
+}
+input:required:invalid:not(:placeholder-shown):focus {
+     box-shadow: 0 0 0 3px rgba(220,53,69,0.15);
+}
+
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    fieldset {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        margin: 0.5rem;
+        padding: 1rem;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    legend {
+        font-size: 1.1rem;
+    }
+
+    /* Горизонтальное расположение радио-кнопок для экономии места */
+    .radio-group {
+        gap: 0.75rem;
+    }
+    
+    .radio-group > label {
+        margin-bottom: 0.25rem;
+    }
+
+    .radio-group > div {
+        margin-right: 1rem;
+    }
+    
+}
